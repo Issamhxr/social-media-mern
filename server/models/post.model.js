@@ -1,22 +1,45 @@
-const mongoose =require ('mongoose');
+import mongoose from "mongoose";
 
 
 const postSchema = new mongoose.Schema({
-     name : String,
-     description : String,
-     media  : [],
+   userId: {
+      type: String,
+      required: true,
+    },
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+    },
+    
+     likes: {
+      type: Map,
+      of: Boolean,
+    },
+    comments: {
+      type: Array,
+      default: [],
+
+    },
+    picturePath: String,
+    userPicturePath: String,
+    description : String,
 
 
-     creator : {
-        type : mongoose.Types.ObjectId,
-        ref : 'users',
-        require: true
-     },
 
 
 
 
+},
+{ timestamps: true }
+);
+
+const Post = mongoose.model("Post", postSchema);
+
+export default Post;
 
 
-})
-module.exports = mongoose.model('posts', postSchema)
+ 

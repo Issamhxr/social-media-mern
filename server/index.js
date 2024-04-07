@@ -1,10 +1,25 @@
-const express = require('express')
+import express from "express";
+import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import multer from "multer";
+import helmet from "helmet";
+import morgan from "morgan";
+import path from "path";
 
-require ('dotenv').config()
-const cors = require('cors')
+import { register } from "./controllers/auth.controller.js";
+import { createPost } from "./controllers/post.controller.js";
+import { verifyToken } from "./middleware/auth.js";
+import User from "./models/user.model.js";
+import Post from "./models/post.model.js";
+//import { users, posts } from "./data/index.js";
+
+
+dotenv.config();
 
 const app = express()
-const mongoose = require('mongoose')
+
 
 
 app.use( express.json() )
@@ -15,10 +30,23 @@ app.get( '/' , ( req ,res ) => {
   res.send( 'hello ')
 })
 
+/* ROUTES WITH FILES */
+app.post("/auth/register", register);
 
-const userRoutes = require('./routes/user.router') 
 
-app.use('/users', userRoutes )
+
+
+/* ROUTES */
+
+import userRoutes from "./routes/user.router.js"
+import authRoutes from "./routes/auth.router.js"
+import postRoutes from "./routes/post.router.js";
+app.use("/posts", postRoutes);
+app.use("/users", userRoutes);
+app.use("/auth", authRoutes);
+
+
+
 
 
 
@@ -42,10 +70,11 @@ db.once("open" , function(){
 
 
 
-
  
-app.listen( process.env.PORT ,  ()=> {
+app.listen(process.env.PORT ,  ()=> {
   console.log (` app listening on port ${process.env.PORT}`);
 
 
 })
+
+

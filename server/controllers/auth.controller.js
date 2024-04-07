@@ -1,58 +1,68 @@
-const { request } = require('express');
-const User = require('../models/user.model')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+import { request }  from "express";
+import User from "../models/user.model.js"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken";
 
+/* REGISTER USER */
 
-exports.signup = ( req , res ) =>  {
+export const register = async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      email,
+      bio,
+      password,
+      picturePath,
+      friends,
+      birthdate,
+      
+    } = req.body;
+
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      bio,
+      password: passwordHash,
+      picturePath,
+      friends,
+      birthdate,
+     
+    });
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
     
-    console.log( req.body)
+   /* LOGGING IN */
 
-    const data = {
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(400).json({ msg: "User does not exist ..." });
 
+    const isMatch = await bcrypt.compare(password , user.password);
+    if (!isMatch) return res.status(400).json({ msg: "Invalid credentials ... " });
 
-        firstname : req.body.firstname,
-        lastname : req.body.lastname,
-
-        password : bcrypt.hashSync( req.body.password,10) ,
-        email : req.body.email,
-        bio : req.body.bio,
-        picture : req.body.picture,
-        birthdate : req.body.birthdate,
-
-    }
-    const _user = new User(data);
-
-    _user.save().then(
-        (createdUser) => { res.status(200).json({ message : "user added successfully ..."})      }
-        
-        ).catch(
-            (err) =>{  res.status(400).json({message :"problem creating the user 123"    }) }
-        )
-        
+    const token = jwt.sign({ id: user._id }, process.env.CLE);
+    delete user.password;
+    res.status(200).json({ token, user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 
 
 
 
-    }
-
-
-    exports.signin = async (req, res) => {
-        try {
-          const { email, password } = req.body;
-          const user = await User.findOne({ email: email });
-          if (!user) return res.status(400).json({ msg: "User does not exist... " });
-      
-          const isMatch = await bcrypt.compare(password , user.password);
-          if (!isMatch) return res.status(400).json({ msg: "wrong password... " });
-      
-          const token = jwt.sign({ id: user._id }, process.env.CLE);
-          delete user.password;
-          res.status(200).json({  message : "seccess ..", token , user });
-        } catch (err) {
-          res.status(500).json({ error: err.message });
-        }
-      };
       
   

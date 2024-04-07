@@ -1,12 +1,22 @@
 
-const express = require ('express')
+import express from "express";
 
-const route = express.Router()
+import {
+  getUser,
+  getUserFriends,
+  addRemoveFriend,
 
-const userController =require('../controllers/auth.controller')
+} from "../controllers/user.controller.js";
 
+import { verifyToken } from "../middleware/auth.js";
 
-route.post('/signup', userController.signup )
-route.post('/signin', userController.signin )
+const router = express.Router();
 
-module.exports = route
+/* READ */
+router.get("/:id", verifyToken, getUser);
+router.get("/:id/friends", verifyToken, getUserFriends);
+
+/* UPDATE */
+router.patch("/:id/:friendId", verifyToken, addRemoveFriend);
+
+export default router;
