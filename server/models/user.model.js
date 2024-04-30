@@ -12,10 +12,13 @@ const UserSchema = new mongoose.Schema(
           default : 'user'
 
         },
-        friends: {
-          type: Array,
-          default: [],
-        },
+      	frends : [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: [],
+          },
+        ],
 
         picturePath: {
           type: String,
@@ -23,8 +26,15 @@ const UserSchema = new mongoose.Schema(
         },
         
         password : String,
-        email : String,
-        bio : String,
+        email: {
+          type: String,
+          required: true,
+          unique: true,
+        },
+        bio: {
+          type: String,
+          default: "",
+        },
        
         birthdate : Date ,
 

@@ -2,34 +2,37 @@ import mongoose from "mongoose";
 
 
 const postSchema = new mongoose.Schema({
-   userId: {
-      type: String,
-      required: true,
-    },
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
+
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  
     
-     likes: {
-      type: Map,
-      of: Boolean,
-    },
-    comments: {
-      type: Array,
-      default: [],
+  	likes: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
 
-    },
-    picturePath: String,
-    userPicturePath: String,
+   comments: [
+			{
+				text: {
+					type: String,
+					required: true,
+				},
+				user: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+					required: true,
+				},
+			},
+		],
+
+    img : String,
     description : String,
-
-
-
 
 
 
@@ -42,4 +45,3 @@ const Post = mongoose.model("Post", postSchema);
 export default Post;
 
 
- 
